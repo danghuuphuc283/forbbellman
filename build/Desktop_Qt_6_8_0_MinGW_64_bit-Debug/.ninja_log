@@ -1,0 +1,20 @@
+# ninja log v6
+23	130	7536651149376924	fordbellman_autogen/timestamp	12efe78202312c5b
+23	130	7536651149376924	fordbellman_autogen/mocs_compilation.cpp	12efe78202312c5b
+23	130	7536651149376924	C:/learnspace/dirg/forbbellman/build/Desktop_Qt_6_8_0_MinGW_64_bit-Debug/fordbellman_autogen/timestamp	12efe78202312c5b
+583	2681	7536598408494491	CMakeFiles/fordbellman.dir/main.cpp.obj	394e661c2c72b312
+580	2656	7536598408464594	CMakeFiles/fordbellman.dir/fordbellman_autogen/mocs_compilation.cpp.obj	3bfeb2ee1529cce
+644	787	7536551339447553	C:/learnspace/dirg/forbbellman/build/Desktop_Qt_6_8_0_MinGW_64_bit-Debug/fordbellman_autogen/EWIEGA46WW/qrc_resources.cpp	b18748bbc6f7ea6b
+644	787	7536551339447553	fordbellman_autogen/EWIEGA46WW/qrc_resources.cpp	b18748bbc6f7ea6b
+23	130	7536651149376924	C:/learnspace/dirg/forbbellman/build/Desktop_Qt_6_8_0_MinGW_64_bit-Debug/fordbellman_autogen/mocs_compilation.cpp	12efe78202312c5b
+3038	3555	7536651179523340	fordbellman.exe	b89d4ec3b6b8b5cb
+131	3038	7536651150449030	CMakeFiles/fordbellman.dir/mainwindow.cpp.obj	755352aab846ba6a
+795	4193	7536551339616987	CMakeFiles/fordbellman.dir/fordbellman_autogen/EWIEGA46WW/qrc_resources.cpp.obj	9749392db7dd07ed
+31	165	7536652197324530	fordbellman_autogen/timestamp	12efe78202312c5b
+31	165	7536652197324530	fordbellman_autogen/mocs_compilation.cpp	12efe78202312c5b
+31	165	7536652197324530	C:/learnspace/dirg/forbbellman/build/Desktop_Qt_6_8_0_MinGW_64_bit-Debug/fordbellman_autogen/timestamp	12efe78202312c5b
+31	165	7536652197324530	C:/learnspace/dirg/forbbellman/build/Desktop_Qt_6_8_0_MinGW_64_bit-Debug/fordbellman_autogen/mocs_compilation.cpp	12efe78202312c5b
+166	324	7536652200159683	fordbellman_autogen/EWIEGA46WW/qrc_resources.cpp	b18748bbc6f7ea6b
+166	324	7536652200159683	C:/learnspace/dirg/forbbellman/build/Desktop_Qt_6_8_0_MinGW_64_bit-Debug/fordbellman_autogen/EWIEGA46WW/qrc_resources.cpp	b18748bbc6f7ea6b
+324	3712	7536652200269323	CMakeFiles/fordbellman.dir/fordbellman_autogen/EWIEGA46WW/qrc_resources.cpp.obj	9749392db7dd07ed
+3712	4247	7536652234140237	fordbellman.exe	b89d4ec3b6b8b5cb
