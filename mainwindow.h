@@ -27,6 +27,9 @@ protected:
 private slots:
     void onAddEdge();
     void onFindShortestPath();
+    void onToggleWeightSign();
+    double calculateEuclideanDistance(const QPointF& p1, const QPointF& p2);
+
 
 private:
     struct Vertex {
@@ -50,6 +53,8 @@ private:
     QChar vertexCounter;
     QList<QGraphicsEllipseItem*> coloredVertices;
     QList<QGraphicsLineItem*> coloredEdges;
+    QPushButton *toggleWeightSignButton;
+
 };
 
 #endif // MAINWINDOW_H

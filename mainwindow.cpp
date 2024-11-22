@@ -8,6 +8,7 @@
 #include <QQueue>
 #include <QMessageBox>
 #include <QDebug>
+#include <cmath> // Để tính khoảng cách Euclid
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -38,14 +39,25 @@ MainWindow::MainWindow(QWidget *parent)
     addEdgeButton->setStyleSheet("background-color: red");
     connect(addEdgeButton, &QPushButton::clicked, this, &MainWindow::onAddEdge);
 
-    // Khai báo thêm nút "Tìm đường đi ngắn nhất"
+    // Tạo nút "Tìm đường đi ngắn nhất"
     QPushButton* findShortestPathButton = new QPushButton("Tìm đường đi ngắn nhất", this);
-    findShortestPathButton->setGeometry(10, 100, 150, 30);  // Đặt vị trí và kích thước của nút
+    findShortestPathButton->setGeometry(10, 100, 150, 30);
     findShortestPathButton->setStyleSheet("background-color: red");
     connect(findShortestPathButton, &QPushButton::clicked, this, &MainWindow::onFindShortestPath);
+
+    // Tạo nút "Đảo dấu trọng số"
+    QPushButton* toggleWeightSignButton = new QPushButton("Đảo dấu trọng số", this);
+    toggleWeightSignButton->setGeometry(10, 150, 150, 30);
+    toggleWeightSignButton->setStyleSheet("background-color: red");
+    connect(toggleWeightSignButton, &QPushButton::clicked, this, &MainWindow::onToggleWeightSign);
 }
 
 MainWindow::~MainWindow() {}
+
+// Hàm tính khoảng cách Euclid
+double MainWindow::calculateEuclideanDistance(const QPointF& p1, const QPointF& p2) {
+    return std::sqrt(std::pow(p1.x() - p2.x(), 2) + std::pow(p1.y() - p2.y(), 2));
+}
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     QPointF sceneMapped = view->mapToScene(event->pos());
@@ -57,9 +69,9 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
     QChar vertexName = vertexCounter;  // Tạo tên đỉnh (A, B, C,...)
     vertexCounter = QChar(vertexCounter.toLatin1() + 1);  // Tăng giá trị của vertexCounter
 
-    // Lưu lại thông tin đỉnh (Sử dụng QChar thay vì QString)
-    Vertex vertex = { sceneMapped, vertexName, ellipse };  // Lưu lại thông tin đỉnh
-    verticesMap[vertexName] = vertex;  // Dùng QChar để truy cập map
+    // Lưu lại thông tin đỉnh
+    Vertex vertex = { sceneMapped, vertexName, ellipse };
+    verticesMap[vertexName] = vertex;
 
     QGraphicsTextItem* label = new QGraphicsTextItem(vertexName);
     label->setPos(sceneMapped.x() + 10, sceneMapped.y() + 10);  // Đặt tên đỉnh gần vị trí của chấm
@@ -67,70 +79,55 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
     scene->addItem(ellipse);
     scene->addItem(label);
 }
-void MainWindow::onAddEdge()
-{
+
+void MainWindow::onAddEdge() {
     if (verticesMap.size() < 2) {
         qDebug("Cần ít nhất 2 đỉnh để thêm cạnh.");
         return;
     }
 
-    // Hiển thị hộp thoại nhập liệu
+    // Hiển thị hộp thoại để chọn hai đỉnh
     bool ok;
-    QString edgeData = QInputDialog::getText(
-        this, "Thêm cạnh",
-        "Nhập hai đỉnh và trọng số (ví dụ: A B -10):",  // Cho phép nhập trọng số âm
-        QLineEdit::Normal, "", &ok);
+    QString edgeData = QInputDialog::getText(this, "Thêm cạnh", "Nhập hai đỉnh (ví dụ: A B):", QLineEdit::Normal, "", &ok);
 
     if (!ok || edgeData.isEmpty())
         return;
 
     // Phân tích dữ liệu nhập
     QStringList parts = edgeData.split(" ");
-    if (parts.size() != 3) {
-        qDebug("Dữ liệu nhập không hợp lệ. Vui lòng nhập theo định dạng: <đỉnh nguồn> <đỉnh đích> <trọng số>");
+    if (parts.size() != 2) {
+        qDebug("Dữ liệu nhập không hợp lệ. Vui lòng nhập theo định dạng: <đỉnh nguồn> <đỉnh đích>");
         return;
     }
 
     QChar from = parts[0].at(0).toUpper();
     QChar to = parts[1].at(0).toUpper();
-    bool weightOk;
-    int weight = parts[2].toInt(&weightOk);  // Trọng số có thể âm, sử dụng toInt để chuyển đổi
-
-    if (!weightOk) {  // Kiểm tra tính hợp lệ của trọng số
-        qDebug("Trọng số không hợp lệ. Vui lòng nhập một số hợp lệ.");
-        return;
-    }
 
     if (!verticesMap.contains(from) || !verticesMap.contains(to)) {
         qDebug("Một hoặc cả hai đỉnh không tồn tại.");
         return;
     }
 
-    // Vẽ cạnh lên scene
+    // Tính khoảng cách Euclid làm trọng số
     Vertex fromVertex = verticesMap[from];
     Vertex toVertex = verticesMap[to];
+    double distance = calculateEuclideanDistance(fromVertex.position, toVertex.position);
+    int weight = static_cast<int>(distance);
 
-    // Vẽ cạnh từ "from" đến "to"
+    // Vẽ cạnh lên scene
     QGraphicsLineItem* line = scene->addLine(QLineF(fromVertex.position, toVertex.position), QPen(Qt::blue, 5));
-
-    // Vẽ cạnh từ "to" đến "from" nếu là cạnh vô hướng
-    QGraphicsLineItem* reverseLine = scene->addLine(QLineF(toVertex.position, fromVertex.position), QPen(Qt::blue, 5));
-
-    // Tính toán vị trí trung điểm của cạnh
     QPointF midpoint = (fromVertex.position + toVertex.position) / 2;
 
-    // Tạo đối tượng văn bản để hiển thị trọng số tại trung điểm
+    // Hiển thị trọng số tại trung điểm
     QGraphicsTextItem* textItem = new QGraphicsTextItem(QString::number(weight));
-    textItem->setPos(midpoint);  // Đặt vị trí của văn bản ở trung điểm
-    textItem->setDefaultTextColor(Qt::black);  // Đặt màu chữ là đen
+    textItem->setPos(midpoint);
+    textItem->setDefaultTextColor(Qt::black);
     scene->addItem(textItem);
 
     // Lưu thông tin cạnh và trọng số
-    edges.append({from, to, weight});  // Lưu thông tin cạnh
-    edges.append({to, from, weight});  // Lưu cạnh ngược (vô hướng)
+    edges.append({from, to, weight});
+    edges.append({to, from, weight});
 }
-
-#include <cmath> // Để tính khoảng cách Euclid
 
 void MainWindow::onFindShortestPath() {
     bool ok;
@@ -138,17 +135,6 @@ void MainWindow::onFindShortestPath() {
     QString target = QInputDialog::getText(this, "Nhập đỉnh đích", "Nhập đỉnh đích:", QLineEdit::Normal, "", &ok);
 
     if (!ok || source.isEmpty() || target.isEmpty()) return;
-
-    // Xóa các đỉnh và cạnh đã tô màu cũ
-    for (QGraphicsEllipseItem* vertexItem : coloredVertices) {
-        vertexItem->setBrush(Qt::red);  // Đặt lại màu cho các đỉnh
-    }
-    coloredVertices.clear();  // Xóa danh sách các đỉnh đã tô màu
-
-    for (QGraphicsLineItem* edgeItem : coloredEdges) {
-        edgeItem->setPen(QPen(Qt::blue, 5));  // Đặt lại màu cho các cạnh
-    }
-    coloredEdges.clear();  // Xóa danh sách các cạnh đã tô màu
 
     // Khởi tạo các giá trị cho thuật toán Bellman-Ford
     QMap<QChar, int> distance;  // Khoảng cách từ nguồn
@@ -263,5 +249,62 @@ void MainWindow::onFindShortestPath() {
         line->setPen(QPen(Qt::green, 3));
         scene->addItem(line);
         coloredEdges.append(line);
+    }
+}
+
+void MainWindow::onToggleWeightSign()
+{
+    if (edges.isEmpty()) {
+        QMessageBox::information(this, "Thông báo", "Không có cạnh nào để đảo dấu.");
+        return;
+    }
+
+    // Hiển thị hộp thoại để chọn hai đỉnh
+    bool ok;
+    QString edgeData = QInputDialog::getText(
+        this, "Đảo dấu trọng số",
+        "Nhập hai đỉnh của cạnh cần đổi dấu (ví dụ: A B):",
+        QLineEdit::Normal, "", &ok);
+
+    if (!ok || edgeData.isEmpty())
+        return;
+
+    // Phân tích dữ liệu nhập
+    QStringList parts = edgeData.split(" ");
+    if (parts.size() != 2) {
+        QMessageBox::warning(this, "Lỗi", "Dữ liệu nhập không hợp lệ. Vui lòng nhập theo định dạng: <đỉnh nguồn> <đỉnh đích>.");
+        return;
+    }
+
+    QChar from = parts[0].at(0).toUpper();
+    QChar to = parts[1].at(0).toUpper();
+
+    // Tìm và đổi dấu trọng số của cạnh
+    bool edgeFound = false;
+    for (Edge& edge : edges) {
+        if ((edge.from == from && edge.to == to) || (edge.from == to && edge.to == from)) {
+            edge.weight = -edge.weight;  // Đảo dấu trọng số
+            edgeFound = true;
+
+            // Cập nhật hiển thị trọng số trên scene
+            for (QGraphicsItem* item : scene->items()) {
+                if (auto textItem = dynamic_cast<QGraphicsTextItem*>(item)) {
+                    QString text = textItem->toPlainText();
+                    bool ok;
+                    int weight = text.toInt(&ok);
+                    if (ok && weight == -edge.weight) {
+                        textItem->setPlainText(QString::number(edge.weight));
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    if (!edgeFound) {
+        QMessageBox::warning(this, "Lỗi", "Cạnh không tồn tại trong đồ thị.");
+    } else {
+        QMessageBox::information(this, "Thành công", "Đã đảo dấu trọng số của cạnh " + QString(from) + " -> " + QString(to) + ".");
     }
 }
