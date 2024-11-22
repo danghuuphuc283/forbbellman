@@ -34,13 +34,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Tạo nút thêm cạnh
     addEdgeButton = new QPushButton("Thêm cạnh", this);
-    addEdgeButton->setGeometry(10, 10, 100, 30);
+    addEdgeButton->setGeometry(10, 50, 150, 30);
+    addEdgeButton->setStyleSheet("background-color: red");
     connect(addEdgeButton, &QPushButton::clicked, this, &MainWindow::onAddEdge);
 
     // Khai báo thêm nút "Tìm đường đi ngắn nhất"
     QPushButton* findShortestPathButton = new QPushButton("Tìm đường đi ngắn nhất", this);
     findShortestPathButton->setGeometry(10, 100, 150, 30);  // Đặt vị trí và kích thước của nút
-    findShortestPathButton->setStyleSheet("background-color: lightgray");
+    findShortestPathButton->setStyleSheet("background-color: red");
     connect(findShortestPathButton, &QPushButton::clicked, this, &MainWindow::onFindShortestPath);
 }
 
